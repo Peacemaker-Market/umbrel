@@ -23,23 +23,25 @@ services:
     volumes:
       -  ${APP_DATA_DIR}/data/redis:/var/shared/redis
   worker:
-    image: dakhodl/peacemaker-umbrel:v0.3.6@sha256:c2111bb810faa0c8b04caf0531ffe349ffb66db63fd12e7b6d25979c9253173e
+    image: dakhodl/peacemaker-umbrel:v0.3.7@sha256:ca01944e1b128a7a1a3f391ed3be675a03fed2c6272586ebd7cdc95dd7b9808d
     networks:
       - production
     stdin_open: true
     restart: on-failure
     tty: true
-    command: ["bundle", "exec", "sidekiq"]
+    command: sidekiq
     environment:
       RAILS_ENV: production
       REDIS_URL_SIDEKIQ: "redis://redis:6379/1"
       SOCKS_PROXY_URL: "${TOR_PROXY_IP}:${TOR_PROXY_PORT}"
-      HIDDEN_SERVICE_ONION: $PEACEMAKER_P2P_HIDDEN_SERVICE
+      P2P_SERVICE_ONION: $PEACEMAKER_P2P_HIDDEN_SERVICE
     depends_on:
       - redis
       - web
+    volumes:
+      ${APP_DATA_DIR}/data/keys:/var/app/keys
   web:
-    image: dakhodl/peacemaker-umbrel:v0.3.6@sha256:c2111bb810faa0c8b04caf0531ffe349ffb66db63fd12e7b6d25979c9253173e
+    image: dakhodl/peacemaker-umbrel:v0.3.7@sha256:ca01944e1b128a7a1a3f391ed3be675a03fed2c6272586ebd7cdc95dd7b9808d
     networks:
       - production
     ports:
@@ -52,10 +54,14 @@ services:
     environment:
       RAILS_ENV: production
       REDIS_URL_SIDEKIQ: "redis://redis:6379/1"
-      WEB_PASSWORD: 'changeme'
+      WEB_PASSWORD: $APP_PASSWORD
       WEB_USERNAME: 'admin'
       SOCKS_PROXY_URL: "${TOR_PROXY_IP}:${TOR_PROXY_PORT}"
-      HIDDEN_SERVICE_ONION: $PEACEMAKER_P2P_HIDDEN_SERVICE
+      APP_ONION: $APP_HIDDEN_SERVICE
+      APP_DOMAIN: $APP_DOMAIN
+      P2P_SERVICE_ONION: $PEACEMAKER_P2P_HIDDEN_SERVICE
     depends_on:
       - redis
       - postgres
+    volumes:
+      ${APP_DATA_DIR}/data/keys:/var/app/keys
