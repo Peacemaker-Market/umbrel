@@ -39,7 +39,7 @@ services:
       - redis
       - web
     volumes:
-      ${APP_DATA_DIR}/data/keys:/var/app/keys
+      - ${APP_DATA_DIR}/data/keys:/var/app/keys
   web:
     image: dakhodl/peacemaker-umbrel:v0.3.7@sha256:ca01944e1b128a7a1a3f391ed3be675a03fed2c6272586ebd7cdc95dd7b9808d
     networks:
@@ -64,4 +64,4 @@ services:
       - redis
       - postgres
     volumes:
-      ${APP_DATA_DIR}/data/keys:/var/app/keys
+      - ${APP_DATA_DIR}/data/keys:/var/app/keys
